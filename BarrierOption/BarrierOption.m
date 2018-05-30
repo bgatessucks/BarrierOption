@@ -9,8 +9,11 @@ BeginPackage["BarrierOption`"]
 bp::usage="Helper function"
 bpp::usage="Helper function"
 
-(*defgGeneric::usahe=""*)
-(*phi::usage="Utility function"*)
+(*defgGeneric::usage=""*)
+phi::usage="Utility function"
+smallPhi::usage=""
+bigPhi::usage=""
+localDot::usage=""
 
 barrierOption::usage="Returns the value of a barrier option"
 doubleKnockOutOutsideBarrierOptionValue::usage="Returns the value of a double knock-out outside barrier option."
@@ -25,10 +28,31 @@ bpp[low_, high_, n_] = 2 high -  bp[low, high, n];
 
 defgGeneric[nontterm_, tterm_, t_, lastterm_, den_, additionalterm_] = (nontterm + tterm t + lastterm) / den + additionalterm;
 
-phi = Function[{mean, cov}, CDF[MultinormalDistribution[mean, cov], #] &];
-SetAttributes[phi, NumericFunction];
+(*localDot[x_, y_] /; And[VectorQ[x], VectorQ[y]] := Total[x y];
+localDot[x_, y_] /; And[MatrixQ[x], VectorQ[y]] := Map[Total[# y] &, x];
+localDot[x_, y_] /; And[VectorQ[x], MatrixQ[y]] := Map[Total[x #] &, y];
+localDot[x_, y_] /; And[MatrixQ[x], MatrixQ[y]] := Outer[Total[#1 #2] &, x, Transpose[y], 1, 1]
+SetAttributes[localDot, NumericFunction];*)
 
-(* CDF[MultinormalDostribution[, ], ] *)
+pdfMultiNormalDistribution[corrMat_, x_] = 1 / ((2 Pi)^(Length[corrMat] / 2) * Sqrt[Det[corrMat]]) Exp[-1/2 Dot[x, Dot[Inverse[corrMat], x]]];
+SetAttributes[pdfMultiNormalDistribution, Union[Attributes[pdfMultiNormalDistribution], {NumericFunction}]];
+smallPhi[mean_, covMat_, x_] := 
+	Module[{vols, corrMat}, 
+		vols = Sqrt[Diagonal[covMat]];
+		corrMat = covMat / Outer[#1 #2 &, vols ,vols, 1, 1]; 
+		pdfMultiNormalDistribution[corrMat, (x - mean) / vols]
+	];
+SetAttributes[smallPhi, Union[Attributes[smallPhi], {NumericFunction}]];
+	
+(*phi = Function[{mean, cov}, vols=Sqrt[Diagonal[cov]]; CDF[MultinormalDistribution[ConstantArray[0, Length[cov]], cov / Outer[#1 #2 &, vols ,vols, 1, 1]], (# - mean) / vols] &];*)
+phi[mean_, covMat_, x_] := 
+	Module[{len, vars, localPhi}, 
+		len = Length[x];
+		vars = Unique["z"] & /@ Range[len];
+		localPhi = smallPhi[mean, covMat, vars];
+		NIntegrate@@{localPhi, Sequence @@ Transpose[{vars, ConstantArray[-Infinity, len], x}]}
+	]
+SetAttributes[phi, NumericFunction];
 
 barrierOption[cp_, {sUnd_, sYield_, sVol_}, {bUnd_, bYield_, bVol_}, corr_, intRate_, {t1_, t2_, bLow_, bHigh_}, strike_, t_, ts_, {nMin_, nMax_}] :=
     Module[ {
