@@ -1,0 +1,209 @@
+\documentclass[12pt,twoside]{article}
+\usepackage{graphicx}
+\usepackage{epsfig}
+\usepackage{fancyhdr}
+\usepackage{subeqnarray}
+%\usepackage{subfigure}
+%\usepackage{subfig}
+\usepackage{subcaption}
+\captionsetup[subtable]{position=bottom}
+\usepackage{dsfont}
+\usepackage[T1]{fontenc}
+\usepackage{ae,aecompl}
+\usepackage{pdfpages}
+% can use backref=page
+\usepackage[]{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+\usepackage{caption}
+%\usepackage{color}
+\usepackage{transparent}
+\usepackage{titlesec}
+\usepackage{grffile}
+% \usepackage{comment}
+% \excludecomment{figure}
+% \let\endfigure\relax
+\usepackage{placeins}
+\usepackage{attachfile}
+\usepackage{bbold}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{dcolumn}
+\usepackage{textcomp}
+\usepackage{lscape}
+%\usepackage[strings]{underscore}
+%\usepackage[normalem]{ulem}
+\usepackage{soul}
+
+% This is FULLPAGE.STY by H.Partl, Version 2 as of 15 Dec 1988.
+% Document Style Option to fill the paper just like Plain TeX.
+
+%\typeout{Style Option FULLPAGE Version 2 as of 15 Dec 1988}
+
+\topmargin 0pt
+\advance \topmargin by -\headheight
+\advance \topmargin by -\headsep
+
+\textheight 8.9in
+
+\oddsidemargin 0pt
+\evensidemargin \oddsidemargin
+\marginparwidth 0.5in
+
+\textwidth 6.5in
+
+
+% For users of A4 paper: The above values are suited for american 8.5x11in
+% paper. If your output driver performs a conversion for A4 paper, keep
+% those values. If your output driver conforms to the TeX standard (1in/1in),
+% then you should add the following commands to center the text on A4 paper:
+
+ \advance\hoffset by -3mm  % A4 is narrower.
+ \advance\voffset by  8mm  % A4 is taller.
+
+%\endinput
+%\renewcommand{\chaptername}{}
+% \newcommand{\mychapter}[2]{
+%     \setcounter{chapter}{#1}
+%     \setcounter{section}{0}
+%     \chapter*{#2}
+%     \addcontentsline{toc}{chapter}{#2}
+
+\titleformat{\chapter}
+  {\Large\bfseries} % format
+  {}                % label
+  {0pt}             % sep
+  {\huge}           % before-code    
+
+ 
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+\newcommand\mc[1]{\multicolumn{1}{c}{#1}} % handy shortcut macro
+
+\begin{document}
+
+\thispagestyle{empty}
+
+\bigskip
+
+% \begin{abstract}
+
+% \end{abstract}
+\title{Log file for Barrier Option}
+
+\maketitle
+\thispagestyle{empty}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[RO,LE]{\thepage}
+\fancyhead[LO,RE]{}
+\fancyfoot[CO,CE]{}
+\fancyfoot[RO]{
+\begin{picture}(0,0)
+%\put(-15,0){\includegraphics[scale=0.5]{}}
+\put(0,-10){\includegraphics[scale=0.15]{files/GMT_logo_blue}}
+\end{picture}
+}
+\fancyfoot[RE]{
+\begin{picture}(0,0)
+%\put(-60,0){\includegraphics[scale=0.5]{}}
+\put(0,-10){\includegraphics[scale=0.15]{files/GMT_logo_blue}}
+\end{picture}
+}
+
+\clearpage
+\tableofcontents
+\thispagestyle{empty}
+
+\newpage
+\pagenumbering{arabic}
+
+% \maketitle
+% 
+% \begin{abstract}
+% 
+% \end{abstract}
+
+\section{Introduction}
+
+The goal is to express all barrier option payoffs in terms of a unique ``atom'' formula. Rebates are not included at the moment.
+
+\section{Atom: ``up-and-out; down-and-out''}
+
+The fundamental payoff of choice is relative to the ``up-and-out; down-and-out'' payoff. The barriers are $L, U$ and the active window if the continuously monitored interval $[t_s, t_e]$. $T_e$ is the expiry of the option, $S$ the underlying and $X$ the strike. 
+
+\begin{eqnarray}
+ \text{payoff} & = & \max(S-X, 0)\ \mathbb{1}_{\forall t \in [t_s, t_e]: L < S(t) < U}\ \nonumber \\
+               & \equiv\ & \text{uodo}(S, X, L, U, \{t_{s}, t_e\}, T_{e})
+\end{eqnarray}
+
+\section{The zoo}
+
+
+\subsection{vanilla}
+
+\begin{eqnarray}
+ \text{payoff} & = & \max(S-X, 0) \nonumber \\
+               & = & \text{uodo}(S, X, 0, \infty, \{0, T_{e}\}, T_{e})
+\end{eqnarray}
+
+
+\subsection{single barrier, B}
+
+\noindent \underline{``up-and-out'' - $S_0 < B$}
+
+\begin{eqnarray}
+ \text{payoff} & = & \max(S - X, 0) \mathbb{1}_{\forall t \in [t_s, t_e]: S(t) < B}\ \nonumber \\
+               & = & \text{uodo}(S, X, 0, B, \{t_{s}, t_e\}, T_{e})
+\end{eqnarray}
+
+\noindent \underline{``down-and-out'' - $B < S_0$}
+
+\begin{eqnarray}
+ \text{payoff} & = & \max(S - X, 0) \mathbb{1}_{\forall t \in [t_s, t_e]: B < S(t)}\ \nonumber \\
+               & = & \text{uodo}(S, X, B, \infty, \{t_{s}, t_e\}, T_{e})
+\end{eqnarray}
+
+\noindent \underline{``down and in'' - $ B < S_0$}
+
+\begin{eqnarray}
+ \text{payoff} & = & \max(S-X, 0) \mathbb{1}_{\exists t^{\ast} \in [t_s, t_e]: S(t^{\ast}) < B}\ \nonumber \\
+               & = & \max(S-X, 0) \left(1 - \mathbb{1}_{\forall t \in [t_s, t_e]: B < S(t)} \right)\ \nonumber \\
+               & = & \text{``vanilla'' - ``down-and-out''} \nonumber \\
+               & = & \text{uodo}(S, X, 0, \infty, \{0, T_{e}\}, T_{e}) - \text{uodo}(S, X, B, \infty, \{t_{s}, t_e\}, T_{e})
+\end{eqnarray}
+
+\noindent \underline{``up and in'' - $ S_0 < B$}
+
+\begin{eqnarray}
+ \text{payoff} & = & \max(S-X, 0) \mathbb{1}_{\exists t^{\ast} \in [t_s, t_e]: B < S(t^{\ast})}\ \nonumber \\
+               & = & \max(S-X, 0) \left(1 - \mathbb{1}_{\forall t \in [t_s, t_e]: S(t) < B} \right)\ \nonumber \\
+               & = & \text{``vanilla'' - ``up-and-out''} \nonumber \\
+               & = & \text{uodo}(S, X, 0, \infty, \{0, T_{e}\}, T_{e}) - \text{uodo}(S, X, 0, B, \{t_{s}, t_e\}, T_{e})
+\end{eqnarray}
+
+
+\subsection{double barrier, \{L, U\}}
+
+\noindent \underline{``double knock-in'' - $L < S_{0} < U$}
+
+\begin{eqnarray}
+ \text{payoff} & = & \max(S-X, 0)\ \mathbb{1}_{\exists t^{\ast} \in [t_s, t_e]: S(t^{\ast}) < L || U < S(t^{\ast})} \nonumber \\
+               & = & \max(S-X, 0)\ \left(1 -  \mathbb{1}_{\forall t \in [t_s,  t_e]: L < S(t) < U}\right) \nonumber \\
+               & = & \text{``vanilla'' - ``up-and-out;down-and-out''} \nonumber \\
+               & = & \text{uodo}(S, X, 0, \infty, \{0, T_{e}\}, T_{e}) - \text{uodo}(S, X, L, U, \{t_{s}, t_e\}, T_{e})
+\end{eqnarray}
+
+
+\bibliography{./files/references_tmp.bib}
+\bibliographystyle{./files/gmt_tech_report}
+
+
+\end{document}
